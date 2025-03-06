@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="static/images/icon/favicon.png">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.css" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style_index.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/homepage.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/terminale.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/shop.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/email-box.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/phishing_information.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/vulnerabilities.css') }}">
+
+    <title>Potenze dell'Asse: World War II</title>
+</head>
+<body>
+<canvas id="network-background" style="position: absolute; top: 0; left: 0; z-index: -1;"></canvas>
+<nav class="navbar navbar-expand-lg navbar-dark">
+    <a class="navbar-brand" href="/">Reich Hackers</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav">
+            {% if 'user' in session %}
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Fazione {{ player.faction }}, di {{ player.username }}
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <a id="leave" class="dropdown-item" >Abbandona</a>
+                    </div>
+                </li>
+            {% endif %}
+        </ul>
+    </div>
+</nav>
+<button class="node_hacked">
+    <p> Nodi Compromessi: {{player.node_hacked }} / 10</p>
+</button>
+<div class="email-icon-container">
+    <!-- Example mail icon element -->
+    <button id="button-mail" class="button-mail"><i class="fas fa-envelope email-icon" id="emailIcon"></i></button>
+    <div id="emailDropdown" class="email-dropdown">
+        <div class="email-tabs">
+            <button class="email-tab active" onclick="showEmails('received')">Ricevute</button>
+            <button class="email-tab" onclick="showEmails('sent')">Inviate</button>
+        </div>
+        <div id="receivedEmails" class="email-list"></div>
+        <div id="sentEmails" class="email-list" style="display: none;"></div>
+    </div>
+</div>
+<div class="phishing-icon-container">
+    <!-- Example mail icon element -->
+    <button id="button-phishing" class="button-phishing"><img src="/static/images/resource/phishing-button.png"></button>
+    <div id="phishingDropdown" class="phishing-dropdown">
+        <div class="phishing-tabs">
+            <button class="phishing-tab active" >Ricevute</button>
+        </div>
+        <div id="phising-data" class="phishing-list"></div>
+    </div>
+</div>
+<div class="check-token-container">
+    <button id="button-token" class="button-token"><img src="/static/images/resource/flag.png"></button>
+</div>
+<button class="player-resource" onclick="explainByteCoin()">
+    <p> {{player.ByteCoin }}</p><img src="/static/images/resource/ByteCoin.png">
+</button>
+<div class="content">
+    <div id="map_opponent" style="border-radius: 10px"></div>
+    <div id="map_player" style="border-radius: 10px"></div>
+    <p id="map-of" class="map-of"></p>
+    <div class="info-panel" id="info">
+        <button onclick="closeInfoNodo()" id="close-info" style="position: absolute; top: 5px; right: 5px;">X</button>
+        <h2>Informazioni Nodo</h2>
+        <p>Clicca su un nodo per visualizzare le informazioni.</p>
+    </div>
+</div>
+<div id="footer" class="footer">
+    <i id="my_computer" class="fas fa-desktop icon" onclick=openTerminal()></i>
+    <i id="show-map-button" class="fas fa-network-wired icon" onclick=showMapOfPlayer()></i>
+    <i id="show-vulnerabilities" class="fas fa-shield-alt icon" onclick=showVulnerabilities()></i>
+    <i id="buy_software" class="fas fa-virus icon" onclick=showShop()></i>
+</div>
+<div id="message-for-player" class="message-for-player"></div>
+<div id="message-for-player" class="message-for-player"></div>
+<div id="terminal" class="terminal">
+    <div class="terminal-frame">
+        <div class="terminal-header">
+            <div class="terminal-controls">
+                <span class="control close"></span>
+                <span class="control minimize"></span>
+            </div>
+            <span class="terminal-title">{{ player.username }} Command Terminal</span>
+        </div>
+        <div class="terminal-body">
+            <div id="terminal-output"></div>
+            <div class="terminal-input-line">
+                <span id="terminal_name" class="prompt">root@{{ player.username }}$</span>
+                <input type="text" id="terminal-input-field" autocomplete="off">
+            </div>
+        </div>
+    </div>
+</div>
+<div id="shop" class="shop">
+    <div class="shop-frame">
+        <div class="shop-header">
+            <div class="shop-controls">
+                <span class="control close"></span>
+                <span class="control minimize"></span>
+            </div>
+        </div>
+        <h1>Tools Kit</h1>
+         <div class="category">
+            <h2>Recoinnance</h2>
+            <div class="softwares">
+                <div class="software">
+                    <button id="nmap" class="button-img-tool"><img src="{{ url_for('static', filename='images/softwareLogo/nmap.png')}}"></button>
+                    <div class="tool">Nmap</div>
+                    <div class="price">Costo: 10 <img src="/static/images/resource/ByteCoin.png"></div>
+                </div>
+                <div class="software">
+                    <button id="spiderfoot" class="button-img-tool"><img src="{{ url_for('static', filename='images/softwareLogo/spiderfoot.png')}}"></button>
+                    <div class="tool">Spiderfoot</div>
+                    <div class="price">Costo: 10 <img src="/static/images/resource/ByteCoin.png"></div>
+                </div>
+                <div class="software">
+                    <button id="vuln_scan" class="button-img-tool"><img src="{{ url_for('static', filename='images/softwareLogo/nmap.png')}}"></button>
+                    <div class="tool">Vuln Scan Script</div>
+                    <div class="price">Costo: 10 <img src="/static/images/resource/ByteCoin.png"></div>
+                </div>
+            </div>
+        </div>
+        <div class="category">
+            <h2>Weaponization</h2>
+            <div class="softwares">
+                <div class="software">
+                    <button id="exploitDB" class="button-img-tool"><img src="{{ url_for('static', filename='images/softwareLogo/exploitDB.png')}}"></button>
+                    <div class="tool">ExploitDB</div>
+                    <div class="price">Costo: 10 <img src="/static/images/resource/ByteCoin.png"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="category">
+            <h2>Delivery</h2>
+            <div class="softwares">
+                <div class="software">
+                    <button id="setoolkit" class="button-img-tool"><img src="{{ url_for('static', filename='images/softwareLogo/set.png')}}"></button>
+                    <div class="tool">Social-Engineer Toolkit (SET)</div>
+                    <div class="price">Costo: 10 <img src="/static/images/resource/ByteCoin.png"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="category">
+            <h2>Exploitation</h2>
+            <div class="softwares">
+                <div class="software">
+                    <button id="metasploit" class="button-img-tool"><img src="{{ url_for('static', filename='images/softwareLogo/metasploit.png')}}"></button>
+                    <div class="tool">Metasploit</div>
+                    <div class="price">Costo: 10 <img src="/static/images/resource/ByteCoin.png"></div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+<div id="vulnerabilities" class="vulnerabilities">
+    <div id="vulnerabilities-frame" class="vulnerabilities-frame">
+        <div class="vulnerabilities-header">
+            <div class="vulnerabilities-controls">
+                <span class="control close"></span>
+                <span class="control minimize"></span>
+            </div>
+        </div>
+
+    </div>
+</div>
+        <script src="/static/js/shop.js"></script>
+        <script src="/static/js/phishing_script.js"></script>
+        <script src="/static/js/check_token.js"></script>
+        <script src="/static/js/email_script.js"></script>
+        <script src="/static/js/terminale.js"></script>
+        <script src="/static/js/asse/terminale.js"></script>
+        <script src="/static/js/canvas_background.js"></script>
+        <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.min.js"></script>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.min.css" />
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/js/all.min.js"></script>
+        <script src="https://unpkg.com/leaflet-geodesic@2.0.0/leaflet.geodesic.js"></script>
+        <script src="/static/js/check_game_status.js"></script>
+        <script src="/static/js/vulnerabilities.js"></script>
+
+        <script>
+            let intervalIdStatus;
+            document.getElementById('leave').onclick = function() {
+                if (confirm('Sei sicuro di voler abbandonare la partita?')) {
+                     fetch('/leave_game/')
+                        .then(response => {
+                        if (response.ok) {
+                            window.location.href = '/';
+                            clearInterval(intervalIdStatus);
+                        }
+                    });
+                }
+            };
+            window.onload = function() {
+                showMapOfOpponent();
+                check_game_status();
+                intervalIdStatus = setInterval(check_game_status, 60000);
+                {% if player.node_hacked >= 5 %}
+                    window.location.href = '/victory/';
+                {% endif %}
+            };
+
+            function showMapOfOpponent() {
+                divPlayer = document.getElementById('map_player');
+                divOpponent = document.getElementById('map_opponent');
+                i = document.getElementById('show-map-button');
+                i.onclick = showMapOfPlayer;
+                divPlayer.style.display = 'none';
+                divOpponent.style.display = 'block';
+                p = document.getElementById('map-of');
+                p.innerHTML = "Mappa Avversaria (Alleati)";
+
+                const network = {{ network_opponent|tojson }};
+                var map = L.map('map_opponent', {
+                    zoomControl: true,
+                    attributionControl: false,
+                    minZoom: 2,
+                    maxZoom: 6,
+                    dragging: true
+                }).setView([20, 0], 2);
+
+                var southWest = L.latLng(-90, -180);
+                var northEast = L.latLng(90, 180);
+                var bounds = L.latLngBounds(southWest, northEast);
+
+                map.setMaxBounds(bounds);
+                map.on('drag', function () {
+                    map.panInsideBounds(bounds, {animate: false});
+                });
+
+                L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+                    maxZoom: 19
+                }).addTo(map);
+
+                const info = document.getElementById('info');
+                const customIconComputer = L.icon({
+                    iconUrl: '/static/images/icon/pc_icon.png',
+                    iconSize: [36, 36],
+                    iconAnchor: [16, 16],
+                    popupAnchor: [0, -16]
+                });
+                const customIconDatabase = L.icon({
+                    iconUrl: '/static/images/icon/database_icon_allies.png',
+                    iconSize: [36, 20],
+                    iconAnchor: [16, 16],
+                    popupAnchor: [0, -16]
+                });
+
+                // Add nodes to the map
+                network.forEach(node => {
+                    // Parse the services string into an object
+                    let services = {};
+                    if (node.services.startsWith('{') && node.services.endsWith('}')) {
+                        const pairs = node.services.slice(1, -1).split(', ');
+                        for (const pair of pairs) {
+                            const [key, value] = pair.split(': ');
+                            services[parseInt(key)] = value.slice(1, -1); // Rimuovi le virgolette
+                        }
+                    }
+                    // Convert the services object into a string
+                    let porte = '';
+                    let servizi = '';
+                    Object.entries(services).forEach(([port, service]) => {
+                        porte += port + ', ';
+                        servizi += service + ',<br>';
+                    });
+                    porte = porte.slice(0, -2);
+                    servizi = servizi.slice(0, -5);
+
+                    if (node.type == "Database") {
+                        L.marker([node.lat, node.lon], {icon: customIconDatabase})
+                            .addTo(map).on('click', () => {
+                            info.style.display = 'block';
+                            info.innerHTML = `<button onclick="closeInfoNodo()" id="close-info" style="position: absolute; top: 5px; right: 5px;">X</button>
+                    <h2><strong>${node.name}</strong></h2>
+                    <p style="color: green;"><strong style="color: white">Status:</strong><br>${node.status}</p>
+                    <p><strong>Indirizzo IP: </strong><br>${node.ip}</p>`;
+                        });
+                    } else if (node.type == "Computer") {
+                        L.marker([node.lat, node.lon], {icon: customIconComputer})
+                            .addTo(map).on('click', () => {
+                            info.style.display = 'block';
+                            info.innerHTML = `<button onclick="closeInfoNodo()" id="close-info" style="position: absolute; top: 5px; right: 5px;">X</button>
+                    <h2><strong>${node.name}</strong></h2>
+                    <p style="color: green;"><strong style="color: white">Status:</strong><br>${node.status}</p>
+                    <p><strong>Indirizzo IP: </strong><br>${node.ip}</p>`;
+                        });
+                    }
+
+                });
+                // Existing code for map initialization remains the same
+// The following code is added to the end of the file
+
+                // Function to calculate intermediate points on a great circle
+                function intermediatePoints(start, end, numPoints) {
+                    const lat1 = start.lat * Math.PI / 180;
+                    const lon1 = start.lon * Math.PI / 180;
+                    const lat2 = end.lat * Math.PI / 180;
+                    const lon2 = end.lon * Math.PI / 180;
+
+                    const d = 2 * Math.asin(Math.sqrt(Math.pow((Math.sin((lat1 - lat2) / 2)), 2) +
+                        Math.cos(lat1) * Math.cos(lat2) * Math.pow(Math.sin((lon1 - lon2) / 2), 2)));
+
+                    const points = [];
+                    for (let i = 0; i <= numPoints; i++) {
+                        const f = i / numPoints;
+                        const A = Math.sin((1 - f) * d) / Math.sin(d);
+                        const B = Math.sin(f * d) / Math.sin(d);
+                        const x = A * Math.cos(lat1) * Math.cos(lon1) + B * Math.cos(lat2) * Math.cos(lon2);
+                        const y = A * Math.cos(lat1) * Math.sin(lon1) + B * Math.cos(lat2) * Math.sin(lon2);
+                        const z = A * Math.sin(lat1) + B * Math.sin(lat2);
+                        const lat = Math.atan2(z, Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2))) * 180 / Math.PI;
+                        const lon = Math.atan2(y, x) * 180 / Math.PI;
+                        points.push([lat, lon]);
+                    }
+                    return points;
+                }
+
+                // Options for the polyline
+                const polylineOptions = {
+                    color:'#58c6f5',
+                    weight: 1,
+                    opacity: 0.6,
+                    dashArray: '5, 10',
+                    dashOffset: '0'
+                };
+
+                // Function to animate the polyline
+                const animatePolyline = (polyline) => {
+                    let offset = 0;
+                    setInterval(() => {
+                        offset = (offset + 1) % 15;
+                        polyline.setStyle({dashOffset: `${offset}`});
+                    }, 100);
+                };
+
+                // Connect nodes with orthodromic lines (only connecting each point to the next one)
+                for (let i = 0; i < network.length - 1; i++) {
+                    const start = {lat: network[i].lat, lon: network[i].lon};
+                    const end = {lat: network[i + 1].lat, lon: network[i + 1].lon};
+
+                    // Generate points along the great circle
+                    const points = intermediatePoints(start, end, 100);
+
+                    // Create a polyline with these points
+                    const polyline = L.polyline(points, polylineOptions).addTo(map);
+
+                    // Animate the polyline
+                    animatePolyline(polyline);
+                }
+            }
+            function explainByteCoin() {
+                div = document.getElementById('message-for-player');
+                button = document.createElement('button');
+                button.innerHTML = 'Chiudi';
+                button.onclick = function() {
+                    div.style.display = 'none';
+                };
+                div.innerHTML = "<h2>ByteCoin</h2><p>ByteCoin è la valuta virtuale utilizzata per acquistare risorse e servizi all'interno del gioco.</p>";
+                div.appendChild(button);
+                div.style.display = 'block';
+            }
+            function closeInfoNodo() {
+                div = document.getElementById('info');
+                div.style.display = 'none';
+            }
+            function closeChoiceDB() {
+                div = document.getElementById('message-for-player');
+                div.style.display = 'none';
+            }
+            function showChoiceDB() {
+                div = document.getElementById('message-for-player');
+                button = document.createElement('button');
+                button.innerHTML = 'Capito';
+                button.onclick = function() {
+                    div.style.display = 'none';
+                };
+                div.innerHTML = " <h2>Prima di continuare seleziona il tuo database principale</h2><p>Scegli con attenzione il database che desideri utilizzare come principale. Questo sarà il cuore della tua strategia e dovrà essere protetto a tutti i costi per evitare che l'avversario lo conquisti. Per selezionarlo, basta cliccare su un database e scegliere l'opzione 'Rendi principale'.</p>";
+                div.appendChild(button);
+                div.style.display = 'block';
+            }
+            function selectedDB() {
+                div = document.getElementById('message-for-player');
+                button = document.createElement('button');
+                button.innerHTML = 'Continua';
+                button.onclick = function() {
+                    div.style.display = 'none';
+                    window.location.href = '/game';
+                };
+                div.innerHTML = "<h2>Database selezionato</h2><p>Il tuo database principale è stato selezionato con successo. Clicca su 'Continua' per iniziare il gioco.</p>";
+
+                div.appendChild(button);
+                div.style.display = 'block';
+
+            }
+
+            function setDatabase(nodeName) {
+                fetch(`/set_database/${nodeName}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            console.log('Database set successfully for node:', nodeName);
+                            selectedDB();
+                        } else {
+                            console.error('Failed to set database for node:', nodeName);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+            }
+            function showMapOfPlayer() {
+                divPlayer = document.getElementById('map_player');
+                divOpponent = document.getElementById('map_opponent');
+                i = document.getElementById('show-map-button');
+                i.onclick = showMapOfOpponent;
+                divPlayer.style.display = 'block';
+                divOpponent.style.display = 'none';
+                p = document.getElementById('map-of');
+                p.innerHTML = "La tua mappa (Potenze dell'Asse)";
+
+                const network = {{ network_player|tojson }};
+                var map = L.map('map_player', {
+                    zoomControl: true,
+                    attributionControl: false,
+                    minZoom: 2,
+                    maxZoom: 6,
+                    dragging: true
+                }).setView([20, 0], 2);
+
+                var southWest = L.latLng(-90, -180);
+                var northEast = L.latLng(90, 180);
+                var bounds = L.latLngBounds(southWest, northEast);
+
+                map.setMaxBounds(bounds);
+                map.on('drag', function() {
+                    map.panInsideBounds(bounds, { animate: false });
+                });
+
+                L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+                    maxZoom: 19
+                }).addTo(map);
+
+                const info = document.getElementById('info');
+                const customIconComputer = L.icon({
+                    iconUrl: '/static/images/icon/pc_icon.png',
+                    iconSize: [36, 36],
+                    iconAnchor: [16, 16],
+                    popupAnchor: [0, -16]
+                });
+                const customIconDatabase = L.icon({
+                    iconUrl: '/static/images/icon/database_icon_axies.png',
+                    iconSize: [36, 20],
+                    iconAnchor: [16, 16],
+                    popupAnchor: [0, -16]
+                });
+
+                // Add nodes to the map
+                network.forEach(node => {
+                    // Parse the services string into an object
+                    let services = {};
+                    if (node.services.startsWith('{') && node.services.endsWith('}')) {
+                        const pairs = node.services.slice(1, -1).split(', ');
+                        for (const pair of pairs) {
+                            const [key, value] = pair.split(': ');
+                            services[parseInt(key)] = value.slice(1, -1); // Rimuovi le virgolette
+                        }
+                    }
+                    // Convert the services object into a string
+                    let porte = '';
+                    let servizi = '';
+                    Object.entries(services).forEach(([port, service]) => {
+                        porte += port + ', ';
+                        servizi += service + ',<br>';
+                    });
+                    porte = porte.slice(0, -2);
+                    servizi = servizi.slice(0, -5);
+
+                    if(node.type == "Database") {
+                        L.marker([node.lat, node.lon], { icon: customIconDatabase })
+                            .addTo(map).on('click', () => {
+                            info.style.display = 'block';
+                            info.innerHTML = `<button onclick="closeInfoNodo()" id="close-info" style="position: absolute; top: 5px; right: 5px;">X</button>
+                        <h2><strong>${node.name}</strong></h2>
+                        <p style="color: green;"><strong style="color: white">Status:</strong><br>${node.status}</p>
+                        <p><strong>Indirizzo IP: </strong><br>${node.ip}</p>
+                        <p><strong>Sistema Opertivo:</strong><br> ${node.os}</p>
+                        <p><strong>Porte aperte: </strong><br>${porte}</p>
+                        <p><strong>Servizi:</strong><br> ${servizi}</p>`;
+                        });
+                    }else if(node.type == "Computer") {
+                        L.marker([node.lat, node.lon], { icon: customIconComputer })
+                            .addTo(map).on('click', () => {
+                            info.style.display = 'block';
+                            info.innerHTML = `<button onclick="closeInfoNodo()" id="close-info" style="position: absolute; top: 5px; right: 5px;">X</button>
+                        <h2><strong>${node.name}</strong></h2>
+                        <p style="color: green;"><strong style="color: white">Status:</strong><br>${node.status}</p>
+                        <p><strong>Indirizzo IP: </strong><br>${node.ip}</p>
+                        <p><strong>Sistema Opertivo:</strong><br> ${node.os}</p>
+                        <p><strong>Porte aperte: </strong><br>${porte}</p>
+                        <p><strong>Servizi:</strong><br> ${servizi}</p>`;
+                        });
+                    }
+
+                });
+                // Existing code for map initialization remains the same
+                // The following code is added to the end of the file
+
+                // Function to calculate intermediate points on a great circle
+                function intermediatePoints(start, end, numPoints) {
+                    const lat1 = start.lat * Math.PI / 180;
+                    const lon1 = start.lon * Math.PI / 180;
+                    const lat2 = end.lat * Math.PI / 180;
+                    const lon2 = end.lon * Math.PI / 180;
+
+                    const d = 2 * Math.asin(Math.sqrt(Math.pow((Math.sin((lat1 - lat2) / 2)), 2) +
+                        Math.cos(lat1) * Math.cos(lat2) * Math.pow(Math.sin((lon1 - lon2) / 2), 2)));
+
+                    const points = [];
+                    for (let i = 0; i <= numPoints; i++) {
+                        const f = i / numPoints;
+                        const A = Math.sin((1 - f) * d) / Math.sin(d);
+                        const B = Math.sin(f * d) / Math.sin(d);
+                        const x = A * Math.cos(lat1) * Math.cos(lon1) + B * Math.cos(lat2) * Math.cos(lon2);
+                        const y = A * Math.cos(lat1) * Math.sin(lon1) + B * Math.cos(lat2) * Math.sin(lon2);
+                        const z = A * Math.sin(lat1) + B * Math.sin(lat2);
+                        const lat = Math.atan2(z, Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2))) * 180 / Math.PI;
+                        const lon = Math.atan2(y, x) * 180 / Math.PI;
+                        points.push([lat, lon]);
+                    }
+                    return points;
+                }
+
+                // Options for the polyline
+                const polylineOptions = {
+                    color: '#ff0000',
+                    weight: 1,
+                    opacity: 0.6,
+                    dashArray: '5, 10',
+                    dashOffset: '0'
+                };
+
+                // Function to animate the polyline
+                const animatePolyline = (polyline) => {
+                    let offset = 0;
+                    setInterval(() => {
+                        offset = (offset + 1) % 15;
+                        polyline.setStyle({ dashOffset: `${offset}` });
+                    }, 100);
+                };
+
+                // Connect nodes with orthodromic lines (only connecting each point to the next one)
+                for (let i = 0; i < network.length - 1; i++) {
+                    const start = {lat: network[i].lat, lon: network[i].lon};
+                    const end = {lat: network[i+1].lat, lon: network[i+1].lon};
+
+                    // Generate points along the great circle
+                    const points = intermediatePoints(start, end, 100);
+
+                    // Create a polyline with these points
+                    const polyline = L.polyline(points, polylineOptions).addTo(map);
+
+                    // Animate the polyline
+                    animatePolyline(polyline);
+                }
+            }
+        </script>
+</body>
+</html>
+

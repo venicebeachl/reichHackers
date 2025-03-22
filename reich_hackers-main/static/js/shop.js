@@ -91,7 +91,6 @@ document.getElementById("nmap").addEventListener("click", function() {
         message_div.style.display = 'none';
     };
 });
-
 document.getElementById("spiderfoot").addEventListener("click", function() {
     message_div = document.getElementById('message-for-player');
     message_div.style.zIndex = 3000;
@@ -313,7 +312,6 @@ document.getElementById("exploitDB").addEventListener("click", function() {
         message_div.style.display = 'none';
     };
 });
-
 document.getElementById("setoolkit").addEventListener("click", function() {
     message_div = document.getElementById('message-for-player');
     message_div.style.zIndex = 3000;
@@ -385,6 +383,444 @@ document.getElementById("setoolkit").addEventListener("click", function() {
 
     }
 
+    button_no.onclick = function () {
+        message_div.style.display = 'none';
+    };
+});
+document.getElementById("veil").addEventListener("click", function() {
+    message_div = document.getElementById('message-for-player');
+    message_div.style.zIndex = 3000;
+    message_div.innerHTML = "Vuoi acquistare il tool utilizzabile da terminale di Veil?";
+    message_div.style.display = 'block';
+
+    button_yes = document.createElement('button');
+    button_yes.innerHTML = 'Sì';
+    button_no = document.createElement('button');
+    button_no.innerHTML = 'No';
+
+    const buttonContainer = document.createElement('div');
+    buttonContainer.className = 'button-container-shop';
+    buttonContainer.appendChild(button_yes);
+    buttonContainer.appendChild(button_no);
+    message_div.appendChild(buttonContainer);
+
+    button_yes.onclick = function() {
+        fetch('/check_tool/veil')
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    const toolData = {
+                        name: 'veil',
+                        description: 'Veil è uno strumento per generare payload bypassanti gli antivirus.',
+                    };
+                    fetch('/add_tool/', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(toolData),
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            message_div.innerHTML = "Hai acquistato Veil!";
+                            button = document.createElement('button');
+                            button.innerHTML = 'OK';
+                            while (buttonContainer.firstChild) {
+                                buttonContainer.removeChild(buttonContainer.firstChild);
+                            }
+                            buttonContainer.appendChild(button);
+                            button.onclick = function() {
+                                message_div.style.display = 'none';
+                                window.location.reload();
+                            };
+                            message_div.appendChild(buttonContainer);
+                        } else {
+                            alert("Non hai abbastanza soldi per acquistare Veil!");
+                            message_div.style.display = 'none';
+                        }
+                    });
+                } else {
+                    message_div.innerHTML = "Hai acquistato Veil in precedenza!";
+                    button = document.createElement('button');
+                    button.innerHTML = 'OK';
+                    while (buttonContainer.firstChild) {
+                        buttonContainer.removeChild(buttonContainer.firstChild);
+                    }
+                    buttonContainer.appendChild(button);
+                    button.onclick = function() {
+                        message_div.style.display = 'none';
+                        window.location.reload();
+                    };
+                    message_div.appendChild(buttonContainer);
+                }
+            });
+    }
+    button_no.onclick = function () {
+        message_div.style.display = 'none';
+    };
+});
+document.getElementById("msfvenom").addEventListener("click", function() {
+    message_div = document.getElementById('message-for-player');
+    message_div.style.zIndex = 3000;
+    message_div.innerHTML = "Vuoi acquistare il tool utilizzabile da terminale di MSFVenom?";
+    message_div.style.display = 'block';
+
+    button_yes = document.createElement('button');
+    button_yes.innerHTML = 'Sì';
+    button_no = document.createElement('button');
+    button_no.innerHTML = 'No';
+
+    const buttonContainer = document.createElement('div');
+    buttonContainer.className = 'button-container-shop';
+    buttonContainer.appendChild(button_yes);
+    buttonContainer.appendChild(button_no);
+    message_div.appendChild(buttonContainer);
+
+    button_yes.onclick = function() {
+        fetch('/check_tool/msfvenom')
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    const toolData = {
+                        name: 'msfvenom',
+                        description: 'Msfvenom è uno strumento per generare payload per Metasploit.',
+                    };
+                    fetch('/add_tool/', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(toolData),
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            message_div.innerHTML = "Hai acquistato Msfvenom!";
+                            button = document.createElement('button');
+                            button.innerHTML = 'OK';
+                            while (buttonContainer.firstChild) {
+                                buttonContainer.removeChild(buttonContainer.firstChild);
+                            }
+                            buttonContainer.appendChild(button);
+                            button.onclick = function() {
+                                message_div.style.display = 'none';
+                                window.location.reload();
+                            };
+                            message_div.appendChild(buttonContainer);
+                        } else {
+                            alert("Non hai abbastanza soldi per acquistare Msfvenom!");
+                            message_div.style.display = 'none';
+                        }
+                    });
+                } else {
+                    message_div.innerHTML = "Hai acquistato Msfvenom in precedenza!";
+                    button = document.createElement('button');
+                    button.innerHTML = 'OK';
+                    while (buttonContainer.firstChild) {
+                        buttonContainer.removeChild(buttonContainer.firstChild);
+                    }
+                    buttonContainer.appendChild(button);
+                    button.onclick = function() {
+                        message_div.style.display = 'none';
+                        window.location.reload();
+                    };
+                    message_div.appendChild(buttonContainer);
+                }
+            });
+    }
+    button_no.onclick = function () {
+        message_div.style.display = 'none';
+    };
+});
+document.getElementById("maltego").addEventListener("click", function() {
+    message_div = document.getElementById('message-for-player');
+    message_div.style.zIndex = 3000;
+    message_div.innerHTML = "Vuoi acquistare il tool utilizzabile da terminale di Maltego?";
+    message_div.style.display = 'block';
+
+    button_yes = document.createElement('button');
+    button_yes.innerHTML = 'Sì';
+    button_no = document.createElement('button');
+    button_no.innerHTML = 'No';
+
+    const buttonContainer = document.createElement('div');
+    buttonContainer.className = 'button-container-shop';
+    buttonContainer.appendChild(button_yes);
+    buttonContainer.appendChild(button_no);
+    message_div.appendChild(buttonContainer);
+
+    button_yes.onclick = function() {
+        fetch('/check_tool/maltego')
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    const toolData = {
+                        name: 'maltego',
+                        description: 'Maltego è uno strumento di OSINT.',
+                    };
+                    fetch('/add_tool/', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(toolData),
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            message_div.innerHTML = "Hai acquistato Maltego!";
+                            button = document.createElement('button');
+                            button.innerHTML = 'OK';
+                            while (buttonContainer.firstChild) {
+                                buttonContainer.removeChild(buttonContainer.firstChild);
+                            }
+                            buttonContainer.appendChild(button);
+                            button.onclick = function() {
+                                message_div.style.display = 'none';
+                                window.location.reload();
+                            };
+                            message_div.appendChild(buttonContainer);
+                        } else {
+                            alert("Non hai abbastanza soldi per acquistare Maltego!");
+                            message_div.style.display = 'none';
+                        }
+                    });
+                } else {
+                    message_div.innerHTML = "Hai acquistato Maltego in precedenza!";
+                    button = document.createElement('button');
+                    button.innerHTML = 'OK';
+                    while (buttonContainer.firstChild) {
+                        buttonContainer.removeChild(buttonContainer.firstChild);
+                    }
+                    buttonContainer.appendChild(button);
+                    button.onclick = function() {
+                        message_div.style.display = 'none';
+                        window.location.reload();
+                    };
+                    message_div.appendChild(buttonContainer);
+                }
+            });
+    }
+    button_no.onclick = function () {
+        message_div.style.display = 'none';
+    };
+});
+document.getElementById("gophish").addEventListener("click", function() {
+    message_div = document.getElementById('message-for-player');
+    message_div.style.zIndex = 3000;
+    message_div.innerHTML = "Vuoi acquistare il tool utilizzabile da terminale di Gophish?";
+    message_div.style.display = 'block';
+
+    button_yes = document.createElement('button');
+    button_yes.innerHTML = 'Sì';
+    button_no = document.createElement('button');
+    button_no.innerHTML = 'No';
+
+    const buttonContainer = document.createElement('div');
+    buttonContainer.className = 'button-container-shop';
+    buttonContainer.appendChild(button_yes);
+    buttonContainer.appendChild(button_no);
+    message_div.appendChild(buttonContainer);
+
+    button_yes.onclick = function() {
+        fetch('/check_tool/gophish')
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    const toolData = {
+                        name: 'gophish',
+                        description: 'Gophish è uno strumento per il phishing.',
+                    };
+                    fetch('/add_tool/', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(toolData),
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            message_div.innerHTML = "Hai acquistato Gophish!";
+                            button = document.createElement('button');
+                            button.innerHTML = 'OK';
+                            while (buttonContainer.firstChild) {
+                                buttonContainer.removeChild(buttonContainer.firstChild);
+                            }
+                            buttonContainer.appendChild(button);
+                            button.onclick = function() {
+                                message_div.style.display = 'none';
+                                window.location.reload();
+                            };
+                            message_div.appendChild(buttonContainer);
+                        } else {
+                            alert("Non hai abbastanza soldi per acquistare Gophish!");
+                            message_div.style.display = 'none';
+                        }
+                    });
+                } else {
+                    message_div.innerHTML = "Hai acquistato Gophish in precedenza!";
+                    button = document.createElement('button');
+                    button.innerHTML = 'OK';
+                    while (buttonContainer.firstChild) {
+                        buttonContainer.removeChild(buttonContainer.firstChild);
+                    }
+                    buttonContainer.appendChild(button);
+                    button.onclick = function() {
+                        message_div.style.display = 'none';
+                        window.location.reload();
+                    };
+                    message_div.appendChild(buttonContainer);
+                }
+            });
+    }
+    button_no.onclick = function () {
+        message_div.style.display = 'none';
+    };
+});
+document.getElementById("sqlmap").addEventListener("click", function() {
+    message_div = document.getElementById('message-for-player');
+    message_div.style.zIndex = 3000;
+    message_div.innerHTML = "Vuoi acquistare il tool utilizzabile da terminale di sqlmap?";
+    message_div.style.display = 'block';
+
+    button_yes = document.createElement('button');
+    button_yes.innerHTML = 'Sì';
+    button_no = document.createElement('button');
+    button_no.innerHTML = 'No';
+
+    const buttonContainer = document.createElement('div');
+    buttonContainer.className = 'button-container-shop';
+    buttonContainer.appendChild(button_yes);
+    buttonContainer.appendChild(button_no);
+    message_div.appendChild(buttonContainer);
+
+    button_yes.onclick = function() {
+        fetch('/check_tool/sqlmap')
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    const toolData = {
+                        name: 'sqlmap',
+                        description: 'Sqlmap è uno strumento per le SQL Injection.',
+                    };
+                    fetch('/add_tool/', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(toolData),
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            message_div.innerHTML = "Hai acquistato sqlmap!";
+                            button = document.createElement('button');
+                            button.innerHTML = 'OK';
+                            while (buttonContainer.firstChild) {
+                                buttonContainer.removeChild(buttonContainer.firstChild);
+                            }
+                            buttonContainer.appendChild(button);
+                            button.onclick = function() {
+                                message_div.style.display = 'none';
+                                window.location.reload();
+                            };
+                            message_div.appendChild(buttonContainer);
+                        } else {
+                            alert("Non hai abbastanza soldi per acquistare sqlmap!");
+                            message_div.style.display = 'none';
+                        }
+                    });
+                } else {
+                    message_div.innerHTML = "Hai acquistato sqlmap in precedenza!";
+                    button = document.createElement('button');
+                    button.innerHTML = 'OK';
+                    while (buttonContainer.firstChild) {
+                        buttonContainer.removeChild(buttonContainer.firstChild);
+                    }
+                    buttonContainer.appendChild(button);
+                    button.onclick = function() {
+                        message_div.style.display = 'none';
+                        window.location.reload();
+                    };
+                    message_div.appendChild(buttonContainer);
+                }
+            });
+    }
+    button_no.onclick = function () {
+        message_div.style.display = 'none';
+    };
+});
+document.getElementById("responder").addEventListener("click", function() {
+    message_div = document.getElementById('message-for-player');
+    message_div.style.zIndex = 3000;
+    message_div.innerHTML = "Vuoi acquistare il tool utilizzabile da terminale di Responder?";
+    message_div.style.display = 'block';
+
+    button_yes = document.createElement('button');
+    button_yes.innerHTML = 'Sì';
+    button_no = document.createElement('button');
+    button_no.innerHTML = 'No';
+
+    const buttonContainer = document.createElement('div');
+    buttonContainer.className = 'button-container-shop';
+    buttonContainer.appendChild(button_yes);
+    buttonContainer.appendChild(button_no);
+    message_div.appendChild(buttonContainer);
+
+    button_yes.onclick = function() {
+        fetch('/check_tool/responder')
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    const toolData = {
+                        name: 'responder',
+                        description: 'Responder è uno strumento per per il poisoning di rete.',
+                    };
+                    fetch('/add_tool/', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(toolData),
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            message_div.innerHTML = "Hai acquistato Responder!";
+                            button = document.createElement('button');
+                            button.innerHTML = 'OK';
+                            while (buttonContainer.firstChild) {
+                                buttonContainer.removeChild(buttonContainer.firstChild);
+                            }
+                            buttonContainer.appendChild(button);
+                            button.onclick = function() {
+                                message_div.style.display = 'none';
+                                window.location.reload();
+                            };
+                            message_div.appendChild(buttonContainer);
+                        } else {
+                            alert("Non hai abbastanza soldi per acquistare Responder!");
+                            message_div.style.display = 'none';
+                        }
+                    });
+                } else {
+                    message_div.innerHTML = "Hai acquistato Responder in precedenza!";
+                    button = document.createElement('button');
+                    button.innerHTML = 'OK';
+                    while (buttonContainer.firstChild) {
+                        buttonContainer.removeChild(buttonContainer.firstChild);
+                    }
+                    buttonContainer.appendChild(button);
+                    button.onclick = function() {
+                        message_div.style.display = 'none';
+                        window.location.reload();
+                    };
+                    message_div.appendChild(buttonContainer);
+                }
+            });
+    }
     button_no.onclick = function () {
         message_div.style.display = 'none';
     };
@@ -463,4 +899,3 @@ document.getElementById("metasploit").addEventListener("click", function() {
         message_div.style.display = 'none';
     };
 });
-

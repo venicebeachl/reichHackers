@@ -24,11 +24,11 @@ function handleTerminalInput(event) {
         const commandParts = commandTyped.split(' ');
         const command = commandParts[0];
         let param = '';
-        if(commandParts.length > 2){
-            for (let i = 1; i < commandParts.length; i++){
+        if (commandParts.length > 2) {
+            for (let i = 1; i < commandParts.length; i++) {
                 param += commandParts[i] + ' ';
             }
-        }else
+        } else
             param = commandParts[1];
 
         switch (command) {
@@ -49,67 +49,126 @@ function handleTerminalInput(event) {
                 closeTerminal();
                 break;
             case 'vuln_scan':
-                output.innerHTML += `<div>Errore nella sintassi...<br> Sintassi corretta: nmap vuln_scan indirizzo_ip</div>`;break;
+                output.innerHTML += `<div>Errore nella sintassi...<br> Sintassi corretta: nmap vuln_scan indirizzo_ip</div>`; break;
             case 'nmap':
-                if(toolOfPlayer.hasOwnProperty('nmap')){
-                    if(param){
+                if (toolOfPlayer.hasOwnProperty('nmap')) {
+                    if (param) {
                         if (param.includes('vuln_scan')) {
                             const parts = param.split(' ');
                             const ipAddress = parts[1];
-                            if(ipAddress)// Assuming the IP address is the second part
+                            if (ipAddress)// Assuming the IP address is the second part
                                 vulnScan(ipAddress);
                             else
                                 output.innerHTML += `<div>Errore: inserire un indirizzo IP valido</div>`;
                         } else {
                             nmap(param);
                         }
-                    }else
+                    } else
                         output.innerHTML += `<div>Errore: inserire un indirizzo IP valido</div>`;
-                }else
+                } else
                     output.innerHTML += `<div>Errore: non hai acquistato nmap</div>`;
                 break;
             case 'spiderfoot':
-                if(toolOfPlayer.hasOwnProperty('spiderfoot')){
-                    if(param)
+                if (toolOfPlayer.hasOwnProperty('spiderfoot')) {
+                    if (param)
                         output.innerHTML += `<div>Errore: Sintassi Errata... <br>Per entrare in spidefoot digita solamente 'spiderfoot'</div>`;
                     else
                         spiderfoot();
-                }else
+                } else
                     output.innerHTML += `<div>Errore: non hai acquistato spiderfoot</div>`;
 
                 break;
             case 'searchsploit':
-                if(toolOfPlayer.hasOwnProperty('searchsploit')){
-                    if(param)
+                if (toolOfPlayer.hasOwnProperty('searchsploit')) {
+                    if (param)
                         searchsploit(param);
                     else
                         output.innerHTML += `<div>Errore:  inserisci la versione di un serivizio</div>`;
-                }else
+                } else
                     output.innerHTML += `<div>Errore: non hai acquistato exploitDB</div>`;
                 break;
             case 'setoolkit':
-                if(toolOfPlayer.hasOwnProperty('setoolkit')){
-                    if(param)
+                if (toolOfPlayer.hasOwnProperty('setoolkit')) {
+                    if (param)
                         output.innerHTML += `<div>Errore: Sintassi Errata... <br>Per utilizzare il Social-Engineer Toolkit digita solamente 'setoolkit'</div>`;
                     else
                         setoolkit();
-                }else
+                } else
                     output.innerHTML += `<div>Errore: non hai acquistato setoolkit</div>`;
                 break;
             case 'msfdb':
-                if(toolOfPlayer.hasOwnProperty('msfdb')){
-                    if(param)
-                        if(param === 'run' || param === 'start')
+                if (toolOfPlayer.hasOwnProperty('msfdb')) {
+                    if (param)
+                        if (param === 'run' || param === 'start')
                             metasploit();
                         else
                             output.innerHTML += `<div>Errore: Sintassi Errata... <br>Per utilizzare metasploit digita 'msfdb run' o 'msftp start'</div>`;
                     else
                         output.innerHTML += `<div>Errore: Sintassi Errata... <br>Per utilizzare metasploit digita 'msfdb run' o 'msftp start'</div>`;
-                }else
+                } else
                     output.innerHTML += `<div>Errore: non hai acquistato metasploit</div>`;
                 break;
             default:
                 output.innerHTML += `<div>Comando non riconosciuto. Digita “help” per visualizzare l'elenco dei comandi disponibili.</div>`;
+                break;
+
+            case 'veil':
+                const payloadType = commandParts[1];
+                const outputFile = commandParts[2];
+                if (payloadType && outputFile) {
+                    veil(payloadType, outputFile);
+                } else {
+                    output.innerHTML += `<div>Errore: sintassi errata. Usa: veil payload_type output_file</div>`;
+                }
+                break;
+
+            case 'msfvenom':
+                const payload = commandParts[1];
+                const lhost = commandParts[2];
+                const lport = commandParts[3];
+                const msfOutputFile = commandParts[4];
+                if (payload && lhost && lport && msfOutputFile) {
+                    msfvenom(payload, lhost, lport, msfOutputFile);
+                } else {
+                    output.innerHTML += `<div>Errore: sintassi errata. Usa: msfvenom payload lhost lport output_file</div>`;
+                }
+                break;
+
+            case 'maltego':
+                const targetNode = commandParts[1];
+                if (targetNode) {
+                    maltego(targetNode);
+                } else {
+                    output.innerHTML += `<div>Errore: sintassi errata. Usa: maltego target_node</div>`;
+                }
+                break;
+
+            case 'gophish':
+                const campaignName = commandParts[1];
+                const targetList = commandParts.slice(2);
+                if (campaignName && targetList.length > 0) {
+                    gophish(campaignName, targetList);
+                } else {
+                    output.innerHTML += `<div>Errore: sintassi errata. Usa: gophish campaign_name target1 target2 ...</div>`;
+                }
+                break;
+
+            case 'sqlmap':
+                const url = commandParts[1];
+                if (url) {
+                    sqlmap(url);
+                } else {
+                    output.innerHTML += `<div>Errore: sintassi errata. Usa: sqlmap url</div>`;
+                }
+                break;
+
+            case 'responder':
+                const interface = commandParts[1];
+                if (interface) {
+                    responder(interface);
+                } else {
+                    output.innerHTML += `<div>Errore: sintassi errata. Usa: responder interface</div>`;
+                }
                 break;
         }
         document.getElementById('terminal-input-field').value = '';
@@ -130,7 +189,7 @@ function help(toAdd) {
     }
     output.innerHTML += `<div>--------------------</div>`;
 }
-function clear(){
+function clear() {
     const output = document.getElementById('terminal-output');
     output.innerHTML = ``;
 }
@@ -159,7 +218,7 @@ function ping(indirizzo) {
             });
     }, 1000);
 }
-function nmap(indirizzo){
+function nmap(indirizzo) {
     const dataTime = getCurrentDateTime();
     const output = document.getElementById('terminal-output');
     output.innerHTML += `<div>--------------------</div>`;
@@ -168,10 +227,10 @@ function nmap(indirizzo){
     fetch("get_node_info/" + indirizzo)
         .then(response => response.json())
         .then(data => {
-            if(data.node === 'null'){
+            if (data.node === 'null') {
                 output.innerHTML += `<div>Host non raggiungibile</div>`;
                 output.innerHTML += `<div>--------------------</div>`;
-            }else {
+            } else {
                 output.innerHTML += `<br><div>Stato: ${data.node.status}</div>`;
                 output.innerHTML += `<div>Nome: ${data.node.name}</div>`;
                 output.innerHTML += `<div>Indirizzo IP: ${data.node.ip}</div>`;
@@ -203,7 +262,7 @@ function nmap(indirizzo){
         });
 
 }
-function vulnScan(indirizzo){
+function vulnScan(indirizzo) {
     let cont = 0;
     const dataTime = getCurrentDateTime();
     const output = document.getElementById('terminal-output');
@@ -213,10 +272,10 @@ function vulnScan(indirizzo){
     fetch("get_node_info/" + indirizzo)
         .then(response => response.json())
         .then(data => {
-            if(data.node === 'null'){
+            if (data.node === 'null') {
                 output.innerHTML += `<div>Host non raggiungibile</div>`;
                 output.innerHTML += `<div>--------------------</div>`;
-            }else {
+            } else {
                 output.innerHTML += `<br><div>Stato: ${data.node.status}</div>`;
                 output.innerHTML += `<div>Nome: ${data.node.name}</div>`;
                 output.innerHTML += `<div>Indirizzo IP: ${data.node.ip}</div>`;
@@ -281,7 +340,7 @@ function vulnScan(indirizzo){
             }
         });
 }
-function spiderfoot(){
+function spiderfoot() {
     clear();
     terminalCursor = document.getElementById('terminal_name');
     terminalCursor.innerHTML = "sp> ";
@@ -315,7 +374,7 @@ function spiderfoot(){
     document.getElementById('terminal-input-field').onkeypress = handleSpiderfootInput;
 
 }
-function handleSpiderfootInput(event){
+function handleSpiderfootInput(event) {
     if (event.key === 'Enter') {
         commandTyped = document.getElementById('terminal-input-field').value;
         const output = document.getElementById('terminal-output');
@@ -329,11 +388,11 @@ function handleSpiderfootInput(event){
         const commandParts = commandTyped.split(' ');
         const command = commandParts[0];
         let param = '';
-        if(commandParts.length > 2){
-            for (let i = 1; i < commandParts.length; i++){
+        if (commandParts.length > 2) {
+            for (let i = 1; i < commandParts.length; i++) {
                 param += commandParts[i] + ' ';
             }
-        }else
+        } else
             param = commandParts[1];
 
         switch (command) {
@@ -346,21 +405,21 @@ function handleSpiderfootInput(event){
                 </div>`;
                 break;
             case 'scan':
-                if(param){
+                if (param) {
                     output.innerHTML += `<div>Scanning for information...</div>`;
                     fetch("get_information_about_person/" + param)
                         .then(response => response.json())
                         .then(data => {
-                            if(data.information !== 'null'){
+                            if (data.information !== 'null') {
                                 output.innerHTML += `<div>&nbsp;&nbsp;&nbsp;[!] Informazion Found: </div>`;
                                 output.innerHTML += `<div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[*] Related Surname : ${data.information[0]}</div>`;
                                 output.innerHTML += `<div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[*] Related Name : ${data.information[1]}</div>`;
                                 output.innerHTML += `<div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[*] Related Email : ${data.information[2]}</div>`;
 
-                            }else
+                            } else
                                 output.innerHTML += `<div>[*] No data found</div>`;
                         });
-                }else
+                } else
                     output.innerHTML += `<div>Errore: inserire un indirizzo valido</div>`;
                 break;
 
@@ -386,12 +445,12 @@ function handleSpiderfootInput(event){
         output.scrollTop = output.scrollHeight;
     }
 }
-function searchsploit(servizio){
+function searchsploit(servizio) {
     const output = document.getElementById('terminal-output');
     fetch("get_exploit_info/" + servizio)
         .then(response => response.json())
         .then(data => {
-            if(data.exploits !== 'null'){
+            if (data.exploits !== 'null') {
                 exploits = data.exploits;
                 console.log(exploits);
                 output.innerHTML += `<div>--------------------------------------------------------------------------------</div>`;
@@ -401,7 +460,7 @@ function searchsploit(servizio){
                     output.innerHTML += `<div>[-] ${key} | ${value}</div>`;
                 }
                 output.innerHTML += `<div>--------------------------------------------------------------------------------</div>`;
-            }else
+            } else
                 output.innerHTML += `<div>Exploit not found</div>`;
         });
 }
@@ -428,7 +487,7 @@ headerSetoolkit = `<div style="">
     </pre></div>`;
 
 
-function setoolkit(){
+function setoolkit() {
     clear();
     terminalCursor = document.getElementById('terminal_name');
     terminalCursor.innerHTML = "set> ";
@@ -456,8 +515,8 @@ function setoolkit(){
     document.getElementById('terminal-input-field').onkeypress = handleSetoolkitInput;
 }
 
-function handleSetoolkitInput(event){
-    let i= 1;
+function handleSetoolkitInput(event) {
+    let i = 1;
     if (event.key === 'Enter') {
         commandTyped = document.getElementById('terminal-input-field').value;
         const output = document.getElementById('terminal-output');
@@ -472,11 +531,11 @@ function handleSetoolkitInput(event){
         const commandParts = commandTyped.split(' ');
         const command = commandParts[0];
         let param = '';
-        if(commandParts.length > 2){
-            for (let i = 1; i < commandParts.length; i++){
+        if (commandParts.length > 2) {
+            for (let i = 1; i < commandParts.length; i++) {
                 param += commandParts[i] + ' ';
             }
-        }else
+        } else
             param = commandParts[1];
 
         switch (command) {
@@ -491,7 +550,7 @@ function handleSetoolkitInput(event){
                    
       0) Return back to the main menu.
                 </pre>
-                </div>`;break;
+                </div>`; break;
             case '10':
                 clear();
                 output.innerHTML += headerSetoolkit;
@@ -571,7 +630,7 @@ function handleSetoolkitInput(event){
        99) Exit the Social-Engineer Toolkit
             </pre>
             </div>
-        `;break;
+        `; break;
 
             default: output.innerHTML += `<div>Comando non riconosciuto. </div>`;
         }
@@ -583,7 +642,7 @@ function handleSetoolkitInput(event){
 let emailSender = "", numeroEmail = 0, email = [], subject = "", body = "";
 
 
-function startMassEmailAttack(){
+function startMassEmailAttack() {
     clear();
     output = document.getElementById('terminal-output');
     output.innerHTML += `<div>Mass Email Attack</div>`;
@@ -591,7 +650,7 @@ function startMassEmailAttack(){
     output.innerHTML += `<div>Insert sender E-mail: </div>`;
     document.getElementById('terminal-input-field').onkeypress = handleEmailSenderInputForMassAttack;
 }
-function startEmailAttack(){
+function startEmailAttack() {
     clear();
     output = document.getElementById('terminal-output');
     output.innerHTML += `<div>Single Email Attack</div>`;
@@ -599,8 +658,8 @@ function startEmailAttack(){
     output.innerHTML += `<div>Insert sender E-mail: </div>`;
     document.getElementById('terminal-input-field').onkeypress = handleEmailSenderInputForSingleAttack;
 }
-function handleEmailSenderInputForMassAttack(){
-    if(event.key === 'Enter'){
+function handleEmailSenderInputForMassAttack() {
+    if (event.key === 'Enter') {
         commandTyped = document.getElementById('terminal-input-field').value;
         document.getElementById('terminal-input-field').value = '';
         emailSender = commandTyped;
@@ -611,8 +670,8 @@ function handleEmailSenderInputForMassAttack(){
     }
 
 }
-function handleEmailSenderInputForSingleAttack(){
-    if(event.key === 'Enter'){
+function handleEmailSenderInputForSingleAttack() {
+    if (event.key === 'Enter') {
         commandTyped = document.getElementById('terminal-input-field').value;
         document.getElementById('terminal-input-field').value = '';
         emailSender = commandTyped;
@@ -623,25 +682,25 @@ function handleEmailSenderInputForSingleAttack(){
         document.getElementById('terminal-input-field').onkeypress = handleEmailInput;
     }
 }
-function handleNumberEmailForAttack(event){
-    if(event.key === 'Enter'){
+function handleNumberEmailForAttack(event) {
+    if (event.key === 'Enter') {
         commandTyped = document.getElementById('terminal-input-field').value;
         document.getElementById('terminal-input-field').value = '';
         numeroEmail = commandTyped;
         output.innerHTML += `<div>[+] Number of emails: ${commandTyped}</div>`;
-        if(numeroEmail > 3){
+        if (numeroEmail > 3) {
             output.innerHTML += `<div>[!] Mass Email Attack support only 3 emails</div>`;
             output.innerHTML += `<div>Insert number of emails: </div>`
             document.getElementById('terminal-input-field').onkeypress = handleNumberEmailForAttack;
-        }else{
+        } else {
             document.getElementById('terminal-input-field').onkeypress = handleEmailInput;
             output.innerHTML += `<div>Insert email: </div>`;
         }
     }
 }
-var index=0;
-function handleEmailInput(event){
-    if(event.key === 'Enter') {
+var index = 0;
+function handleEmailInput(event) {
+    if (event.key === 'Enter') {
         console.log(numeroEmail);
         numeroEmail--;
         if (numeroEmail >= 0) {
@@ -652,17 +711,17 @@ function handleEmailInput(event){
             output.innerHTML += `<div>[+] Email ${index}: ${email[index]}</div>`;
             index++;
             output.innerHTML += `<div>Insert email : </div>`;
-            if(numeroEmail === 0){
+            if (numeroEmail === 0) {
                 output.removeChild(output.lastChild);
                 output.innerHTML += `<div>Insert subject: </div>`;
                 document.getElementById('terminal-input-field').onkeypress = handleSubjectInput;
-                numeroEmail = i+1;
+                numeroEmail = i + 1;
             }
         }
     }
 }
-function handleSubjectInput(event){
-    if(event.key === 'Enter'){
+function handleSubjectInput(event) {
+    if (event.key === 'Enter') {
         commandTyped = document.getElementById('terminal-input-field').value;
         document.getElementById('terminal-input-field').value = '';
         subject = commandTyped;
@@ -671,8 +730,8 @@ function handleSubjectInput(event){
         document.getElementById('terminal-input-field').onkeypress = handleBodyInput;
     }
 }
-function handleBodyInput(event){
-    if(event.key === 'Enter'){
+function handleBodyInput(event) {
+    if (event.key === 'Enter') {
         commandTyped = document.getElementById('terminal-input-field').value;
         document.getElementById('terminal-input-field').value = '';
         body = commandTyped;
@@ -684,7 +743,7 @@ function handleBodyInput(event){
         output.innerHTML += `<div>Sender E-mail: ${emailSender}</div>`;
         output.innerHTML += `<div>Number of emails: ${numeroEmail}</div>`;
         output.innerHTML += `<div>Victim Emails: </div>`;
-        for(let i=0; i<email.length; i++){
+        for (let i = 0; i < email.length; i++) {
             output.innerHTML += `<div>[-] ${email[i]}</div>`;
         }
         output.innerHTML += `<div>Subject: ${subject}</div>`;
@@ -694,32 +753,32 @@ function handleBodyInput(event){
         document.getElementById('terminal-input-field').onkeypress = handleMassSendEmail;
     }
 }
-function handleMassSendEmail(event){
-    if(event.key === 'Enter'){
+function handleMassSendEmail(event) {
+    if (event.key === 'Enter') {
         commandTyped = document.getElementById('terminal-input-field').value;
-        if(commandTyped === 'Y' || commandTyped === 'y' || commandTyped === '' || commandTyped === 'yes'){
+        if (commandTyped === 'Y' || commandTyped === 'y' || commandTyped === '' || commandTyped === 'yes') {
             output.innerHTML += `<div>[-] Sending emails...</div>`;
             fetch("send_email/", {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({emailSender, email, subject, body})
+                body: JSON.stringify({ emailSender, email, subject, body })
             })
                 .then(response => response.json())
                 .then(data => {
-                    if(data.status === 'success'){
+                    if (data.status === 'success') {
                         output.innerHTML += `<div>[-] Emails sent successfully</div>`;
                         output.innerHTML += `<div>[-] Press Enter to Continue or Ctrl-c to Exit</div>`;
                         document.getElementById('terminal-input-field').onkeypress = handleSetoolkitInput;
                         getToken();
-                    }else{
+                    } else {
                         output.innerHTML += `<div>[-] Emails not sent</div>`;
                         output.innerHTML += `<div>[-] Press Enter to Continue or Ctrl-c to Exit</div>`;
                         document.getElementById('terminal-input-field').onkeypress = handleSetoolkitInput;
                     }
                 });
-        }else{
+        } else {
             output.innerHTML += `<div>[-] Emails not sent</div>`;
             output.innerHTML += `<div>[-] Press Enter to Continue or Ctrl-c to Exit</div>`;
             document.getElementById('terminal-input-field').onkeypress = handleSetoolkitInput;
@@ -727,7 +786,7 @@ function handleMassSendEmail(event){
     }
 }
 
-function showDownloadSetoolkit(){
+function showDownloadSetoolkit() {
     i = 1;
     const interval2 = setInterval(() => {
         if (i > 10) {
@@ -760,7 +819,7 @@ function showDownloadSetoolkit(){
     }, 500);
 
 }
-let metasploitHeader =`<div style="">
+let metasploitHeader = `<div style="">
             <pre style="color: #ffcc00;">
                                           ____________
      [%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%| $a,        |%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%]
@@ -783,7 +842,7 @@ let metasploitHeader =`<div style="">
     Metasploit Documentation: https://docs.metasploit.com/
 
     </pre></div>`;
-function metasploit(){
+function metasploit() {
     clear();
     exploits = undefined;
     exploit_to_use = undefined;
@@ -808,8 +867,8 @@ function metasploit(){
     document.getElementById('terminal-input-field').onkeypress = handleMetasploitInput;
 
 }
-function handleMetasploitInput(event){
-    if(event.key === 'Enter'){
+function handleMetasploitInput(event) {
+    if (event.key === 'Enter') {
         commandTyped = document.getElementById('terminal-input-field').value;
         document.getElementById('terminal-input-field').value = '';
         const output = document.getElementById('terminal-output');
@@ -817,11 +876,11 @@ function handleMetasploitInput(event){
         const commandParts = commandTyped.split(' ');
         const command = commandParts[0];
         let param = '';
-        if(commandParts.length > 2){
-            for (let i = 1; i < commandParts.length; i++){
+        if (commandParts.length > 2) {
+            for (let i = 1; i < commandParts.length; i++) {
                 param += commandParts[i] + ' ';
             }
-        }else
+        } else
             param = commandParts[1];
         switch (command) {
             case 'help':
@@ -837,14 +896,14 @@ function handleMetasploitInput(event){
                 break;
             case 'search':
                 clear();
-                if(!param)
+                if (!param)
                     output.innerHTML += `<div>Errore: inserire un servizio da cercare</div>`;
-                else{
+                else {
                     const output = document.getElementById('terminal-output');
                     fetch("get_exploit_info/" + param)
                         .then(response => response.json())
                         .then(data => {
-                            if(data.exploits !== 'null'){
+                            if (data.exploits !== 'null') {
                                 service = param;
                                 exploits = data.exploits;
                                 output.innerHTML += `<div><strong>Matching Modules</strong> </div>`;
@@ -867,9 +926,9 @@ function handleMetasploitInput(event){
                                 table.appendChild(headerRow);
                                 output.appendChild(table);
                                 length = Object.keys(exploits).length;
-                                i =0;
+                                i = 0;
                                 for (const [key, value] of Object.entries(exploits)) {
-                                    if(i<length) {
+                                    if (i < length) {
                                         const tr = document.createElement('tr');
                                         tr.style.border = 'none';
                                         tr.style.padding = '8px';
@@ -888,22 +947,22 @@ function handleMetasploitInput(event){
                                     }
                                 }
                                 output.innerHTML += `<div>--------------------------------------------------------------------------------</div>`;
-                            }else
+                            } else
                                 output.innerHTML += `<div>Exploit not found</div>`;
                         });
-                }break;
+                } break;
             case 'use':
-                if(!param)
+                if (!param)
                     output.innerHTML += `<div>Errore: inserire un exploit da utilizzare</div>`;
-                else{
-                    if(exploits === undefined){
+                else {
+                    if (exploits === undefined) {
                         output.innerHTML += `<div>[-] Cerca un exploit prima di usarlo</div>`;
-                    }else{
+                    } else {
                         flag = false;
                         target_port = undefined;
                         target_ip = undefined;
                         for (const [key, value] of Object.entries(exploits)) {
-                            if(param === value){
+                            if (param === value) {
                                 exploit_to_use = value;
                                 output.innerHTML += `<br><div>[-] Using exploit ${param}</div>`;
                                 output.innerHTML += `<div>[-] Exploit ${param} loaded</div>`;
@@ -911,105 +970,105 @@ function handleMetasploitInput(event){
                                 flag = true;
                             }
                         }
-                        if(!flag)
+                        if (!flag)
                             output.innerHTML += `<br><div>[-] Exploit not found</div>`;
                     }
-                }break;
+                } break;
             case 'show':
-                if(param === 'options'){
-                    if(exploit_to_use === undefined)
+                if (param === 'options') {
+                    if (exploit_to_use === undefined)
                         output.innerHTML += `<div>[-] Seleziona un exploit prima di visualizzare le opzioni</div>`;
                     else
                         output.innerHTML += `<br><div>[-] Options for ${exploit_to_use}</div>`;
-                        const table = document.createElement('table');
-                                table.style.borderCollapse = 'collapse';
-                                table.style.width = '100%';
+                    const table = document.createElement('table');
+                    table.style.borderCollapse = 'collapse';
+                    table.style.width = '100%';
 
-                                const headerRow = document.createElement('tr');
-                                const headers = ['Name', 'Current Settings', 'Required', 'Description'];
-                                headers.forEach(headerText => {
-                                    const th = document.createElement('th');
-                                    th.style.border = 'none';
-                                    th.style.padding = '8px';
-                                    th.style.textAlign = 'left';
-                                    th.textContent = headerText;
-                                    headerRow.appendChild(th);
-                                });
-                                table.appendChild(headerRow);
-                                output.appendChild(table);
-                                const tr = document.createElement('tr');
-                                td = document.createElement('td');
-                                td.textContent = 'RHOSTS';
-                                td1 = document.createElement('td');
-                                td1.textContent = target_ip;
-                                tr.appendChild(td);
-                                tr.appendChild(td1);
-                                td2 = document.createElement('td');
-                                td2.textContent = 'yes';
-                                tr.appendChild(td2);
-                                td3 = document.createElement('td');
-                                td3.textContent = 'The target host(s)';
-                                tr.appendChild(td3);
-                                table.appendChild(tr);
+                    const headerRow = document.createElement('tr');
+                    const headers = ['Name', 'Current Settings', 'Required', 'Description'];
+                    headers.forEach(headerText => {
+                        const th = document.createElement('th');
+                        th.style.border = 'none';
+                        th.style.padding = '8px';
+                        th.style.textAlign = 'left';
+                        th.textContent = headerText;
+                        headerRow.appendChild(th);
+                    });
+                    table.appendChild(headerRow);
+                    output.appendChild(table);
+                    const tr = document.createElement('tr');
+                    td = document.createElement('td');
+                    td.textContent = 'RHOSTS';
+                    td1 = document.createElement('td');
+                    td1.textContent = target_ip;
+                    tr.appendChild(td);
+                    tr.appendChild(td1);
+                    td2 = document.createElement('td');
+                    td2.textContent = 'yes';
+                    tr.appendChild(td2);
+                    td3 = document.createElement('td');
+                    td3.textContent = 'The target host(s)';
+                    tr.appendChild(td3);
+                    table.appendChild(tr);
 
-                                const tr1 = document.createElement('tr');
-                                td0 = document.createElement('td');
-                                td0.textContent = 'RPORT';
-                                tr1.appendChild(td0);
-                                td4 = document.createElement('td');
-                                td4.textContent = target_port;
-                                tr1.appendChild(td4);
-                                td5 = document.createElement('td');
-                                td5.textContent = 'yes';
-                                tr1.appendChild(td5);
-                                td6 = document.createElement('td');
-                                td6.textContent = 'The target port (TCP)';
-                                tr1.appendChild(td6);
-                                table.appendChild(tr1);
-                                output.appendChild(table);
+                    const tr1 = document.createElement('tr');
+                    td0 = document.createElement('td');
+                    td0.textContent = 'RPORT';
+                    tr1.appendChild(td0);
+                    td4 = document.createElement('td');
+                    td4.textContent = target_port;
+                    tr1.appendChild(td4);
+                    td5 = document.createElement('td');
+                    td5.textContent = 'yes';
+                    tr1.appendChild(td5);
+                    td6 = document.createElement('td');
+                    td6.textContent = 'The target port (TCP)';
+                    tr1.appendChild(td6);
+                    table.appendChild(tr1);
+                    output.appendChild(table);
 
 
-                }else{
+                } else {
                     output.innerHTML += `<br><div>[-] Comando non riconosciuto</div>`;
                 }
 
                 break;
             case 'set':
                 params = param.split(' ');
-                if(params[0].toUpperCase() === 'RHOSTS'){
+                if (params[0].toUpperCase() === 'RHOSTS') {
                     console.log(params[1]);
                     target_ip = params[1];
                     output.innerHTML += `<br><div>[-] RHOSTS => ${target_ip}</div>`;
-                }else if(params[0].toUpperCase() === 'RPORT'){
+                } else if (params[0].toUpperCase() === 'RPORT') {
                     console.log(params[1]);
                     target_port = params[1];
                     output.innerHTML += `<br><div>[-] RPORT => ${target_port}</div>`;
                 }
-                else{
+                else {
                     output.innerHTML += `<br><div>[-] Comando non riconosciuto</div>`;
                 }
                 break;
             case 'exploit':
-                if(exploit_to_use === undefined || service === undefined)
+                if (exploit_to_use === undefined || service === undefined)
                     output.innerHTML += `<div>[-] Seleziona un exploit prima di utilizzarlo</div>`;
-                else{
-                    if(target_ip === undefined || target_port === undefined)
+                else {
+                    if (target_ip === undefined || target_port === undefined)
                         output.innerHTML += `<div>[-] Inserisci l'indirizzo IP e la porta del target</div>`;
-                    else{
+                    else {
                         output.innerHTML += `<div>[-] Attacco in corso...</div>`;
                         fetch("exploit/", {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
                             },
-                            body: JSON.stringify({target_ip, target_port,service})
+                            body: JSON.stringify({ target_ip, target_port, service })
                         })
                             .then(response => response.json())
                             .then(data => {
-                                if(data.token !== 'error'){
+                                if (data.token !== 'error') {
                                     output.innerHTML += `<div>[-] Attacco riuscito </div><br>[+] Token: ${data.token}`;
 
-                                }else{
+                                } else {
                                     output.innerHTML += `<div>[-] Attacco non riuscito, controllare i parametri</div>`;
                                 }
                             });
@@ -1051,7 +1110,7 @@ function getToken(emailSender, email, subject, body) {
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify({emailSender, email, subject, body})
+        body: JSON.stringify({ emailSender, email, subject, body })
     })
         .then(response => response.json())
         .then(data => {
@@ -1059,7 +1118,7 @@ function getToken(emailSender, email, subject, body) {
 }
 document.addEventListener('keydown', (event) => {
     if (event.ctrlKey && event.key === 'c') {
-        if(document.getElementById('terminal').style.display !== 'none') {
+        if (document.getElementById('terminal').style.display !== 'none') {
             if (document.getElementById('terminal-input-field').onkeypress === handleSpiderfootInput) {
                 clear();
                 terminalCursor = document.getElementById('terminal_name');
@@ -1071,14 +1130,14 @@ document.addEventListener('keydown', (event) => {
                 output.style.color = "#33ff33";
                 document.getElementById('terminal-input-field').onkeypress = handleTerminalInput;
             }
-            if(document.getElementById('terminal-input-field').onkeypress === handleSetoolkitInput ||
+            if (document.getElementById('terminal-input-field').onkeypress === handleSetoolkitInput ||
                 document.getElementById('terminal-input-field').onkeypress === handleEmailSenderInputForMassAttack ||
                 document.getElementById('terminal-input-field').onkeypress === handleNumberEmailForAttack ||
                 document.getElementById('terminal-input-field').onkeypress === handleEmailInput ||
                 document.getElementById('terminal-input-field').onkeypress === handleSubjectInput ||
                 document.getElementById('terminal-input-field').onkeypress === handleBodyInput ||
                 document.getElementById('terminal-input-field').onkeypress === handleMassSendEmail ||
-                document.getElementById('terminal-input-field').onkeypress === handleEmailSenderInputForSingleAttack){
+                document.getElementById('terminal-input-field').onkeypress === handleEmailSenderInputForSingleAttack) {
                 clear();
 
                 terminalCursor = document.getElementById('terminal_name');
@@ -1099,3 +1158,95 @@ document.addEventListener('keydown', (event) => {
         }
     }
 });
+
+function veil(payloadType, outputFile) {
+    const output = document.getElementById('terminal-output');
+    output.innerHTML += `<div>Generating Veil payload (${payloadType})...</div>`;
+
+    setTimeout(() => {
+        output.innerHTML += `<div>[+] Payload generated successfully!</div>`;
+        output.innerHTML += `<div>[+] Saved to: ${outputFile}</div>`;
+        output.innerHTML += `<div>--------------------</div>`;
+    }, 2000); // Simula un ritardo di 2 secondi
+}
+
+function msfvenom(payload, lhost, lport, outputFile) {
+    const output = document.getElementById('terminal-output');
+    output.innerHTML += `<div>Generating msfvenom payload (${payload})...</div>`;
+
+    setTimeout(() => {
+        output.innerHTML += `<div>[+] Payload generated successfully!</div>`;
+        output.innerHTML += `<div>[+] LHOST: ${lhost}, LPORT: ${lport}</div>`;
+        output.innerHTML += `<div>[+] Saved to: ${outputFile}</div>`;
+        output.innerHTML += `<div>--------------------</div>`;
+    }, 2000); // Simula un ritardo di 2 secondi
+}
+
+function maltego(targetNode) {
+    const output = document.getElementById('terminal-output');
+    output.innerHTML += `<div>Running Maltego reconnaissance on node: ${targetNode}...</div>`;
+
+    // Simuliamo un ritardo per la ricognizione
+    setTimeout(() => {
+        output.innerHTML += `<div>[+] Node ${targetNode} identified as part of the enemy Cyber Network.</div>`;
+        output.innerHTML += `<div>- IP Address: 192.168.1.${Math.floor(Math.random() * 100)}</div>`;
+        output.innerHTML += `<div>- Operating System: CipherOS v2.3</div>`;
+        output.innerHTML += `<div>- Open Ports: 22 (SSH), 80 (HTTP), 443 (HTTPS)</div>`;
+        output.innerHTML += `<div>- Vulnerabilities Detected:</div>`;
+        output.innerHTML += `<div>  - Weak Encryption Protocol (CipherX)</div>`;
+        output.innerHTML += `<div>  - Unpatched Buffer Overflow in HTTP Service</div>`;
+        output.innerHTML += `<div>--------------------</div>`;
+
+        // Simuliamo un attacco basato sulle vulnerabilità trovate
+        setTimeout(() => {
+            output.innerHTML += `<div>[+] Launching attack on node ${targetNode}...</div>`;
+            output.innerHTML += `<div>- Exploiting Weak Encryption Protocol...</div>`;
+            output.innerHTML += `<div>- Injecting payload via HTTP Service...</div>`;
+            output.innerHTML += `<div>[+] Node ${targetNode} compromised!</div>`;
+            output.innerHTML += `<div>- Access Granted: Root privileges obtained.</div>`;
+            output.innerHTML += `<div>- Extracted Intelligence:</div>`;
+            output.innerHTML += `<div>  - Enemy Communication Plans</div>`;
+            output.innerHTML += `<div>  - Encryption Key Files</div>`;
+            output.innerHTML += `<div>--------------------</div>`;
+        }, 3000); // Simula un ritardo di 3 secondi per l'attacco
+    }, 3000); // Simula un ritardo di 3 secondi per la ricognizione
+}
+
+function gophish(campaignName, targetList) {
+    const output = document.getElementById('terminal-output');
+    output.innerHTML += `<div>Starting GoPhish campaign: ${campaignName}...</div>`;
+
+    setTimeout(() => {
+        output.innerHTML += `<div>[+] Campaign sent to ${targetList.length} targets:</div>`;
+        targetList.forEach(target => {
+            output.innerHTML += `<div>- ${target}</div>`;
+        });
+        output.innerHTML += `<div>[+] Phishing emails delivered successfully!</div>`;
+        output.innerHTML += `<div>--------------------</div>`;
+    }, 4000); // Simula un ritardo di 4 secondi
+}
+
+function sqlmap(url) {
+    const output = document.getElementById('terminal-output');
+    output.innerHTML += `<div>Scanning ${url} for SQL injection vulnerabilities...</div>`;
+
+    setTimeout(() => {
+        output.innerHTML += `<div>[+] Vulnerabilities found:</div>`;
+        output.innerHTML += `<div>- Parameter: id (GET)</div>`;
+        output.innerHTML += `<div>- Type: Boolean-based blind</div>`;
+        output.innerHTML += `<div>- Payload: id=1 AND 1=1</div>`;
+        output.innerHTML += `<div>--------------------</div>`;
+    }, 5000); // Simula un ritardo di 5 secondi
+}
+
+function responder(interface) {
+    const output = document.getElementById('terminal-output');
+    output.innerHTML += `<div>Starting Responder on interface ${interface}...</div>`;
+
+    setTimeout(() => {
+        output.innerHTML += `<div>[+] Captured credentials:</div>`;
+        output.innerHTML += `<div>- Username: admin</div>`;
+        output.innerHTML += `<div>- Hash: NTLMv2-SSP Hash</div>`;
+        output.innerHTML += `<div>--------------------</div>`;
+    }, 3000); // Simula un ritardo di 3 secondi
+}
